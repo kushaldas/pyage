@@ -1,4 +1,4 @@
-# age Rust library
+# pyage Python module
 
 age is a simple, secure and modern encryption tool with small explicit keys, no
 config options, and UNIX-style composability. The format specification is at

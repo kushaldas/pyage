@@ -24,7 +24,7 @@ age-dev@googlegroups.com. age was designed by
 The reference interoperable Golang implementation is available at
 `filippo.io/age <https://filippo.io/age>`_.
 
-This particular Python module is implemented on top of the Rust implementation called `rage <https://github.com/str4d/rage>`_.
+This particular Python module is implemented on top of the Rust crate `age <https://crates.io/crates/age>`_.
 
 .. toctree::
    :maxdepth: 2
