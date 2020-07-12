@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyage's documentation!
-=================================
+Welcome to pyage-rust module documentation!
+===========================================
 
 
 age is a simple, secure and modern encryption tool with small explicit keys, no
