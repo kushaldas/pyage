@@ -2,3 +2,4 @@
 Cargo.lock
 /docs/build
 .venv/
+src/.lib.rs.rustfmt
