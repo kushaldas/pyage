@@ -1,4 +1,11 @@
+import os
 import pyage
+
+
+def clean_tmp_files():
+    for name in ["/tmp/ehost.age", "/tmp/hosts.txt"]:
+        if os.path.exists(name):
+            os.unlink(name)
 
 
 def test_encrypt_decrypt_bytes():
@@ -47,6 +54,8 @@ def test_encrypt_decrypt_files():
 
     assert pyage.encrypt_file("/etc/hosts", "/tmp/ehost.age", [public,])
     assert pyage.decrypt_file("/tmp/ehost.age", "/tmp/hosts.txt", secret)
+    clean_tmp_files()
+
 
 def test_encrypt_decrypt_files_armored():
     with open("tests/files/public.txt") as f:
@@ -61,6 +70,15 @@ def test_encrypt_decrypt_files_armored():
         assert line == "-----BEGIN AGE ENCRYPTED FILE-----\n"
     assert pyage.decrypt_file("/tmp/ehost.age", "/tmp/hosts.txt", secret)
 
+    with open("/etc/hosts") as f:
+        before = f.read()
+
+    with open("/tmp/hosts.txt") as f:
+        after = f.read()
+
+    assert before == after
+    clean_tmp_files()
+
 
 def test_encrypt_decrypt_bytes_withpassword():
     password = "ColaJailhouseLanternPopularCoagulantProofreadSedanActivate"
@@ -73,3 +91,19 @@ def test_encrypt_decrypt_bytes_withpassword():
     decrypted_in_bytes = pyage.decrypt_bytes_withpassword(encrypted, password)
 
     assert text == decrypted_in_bytes.decode("utf-8")
+
+
+def test_encrypt_decrypt_files_withpassword():
+    password = "redhat"
+
+    assert pyage.encrypt_file_withpassword("/etc/hosts", "/tmp/ehost.age", password)
+    assert pyage.decrypt_file_withpassword("/tmp/ehost.age", "/tmp/hosts.txt", password)
+
+    with open("/etc/hosts") as f:
+        before = f.read()
+
+    with open("/tmp/hosts.txt") as f:
+        after = f.read()
+
+    assert before == after
+    clean_tmp_files()

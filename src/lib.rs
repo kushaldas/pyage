@@ -122,13 +122,34 @@ fn encrypt_file(filename: String, outputfile: String, keys: Vec<String>, armor: 
         recipients.push(key);
     }
 
+    let encryptor = age::Encryptor::with_recipients(recipients);
+    encrypt_file_internal(filename, outputfile, encryptor, armor)
+}
+
+
+/// This function encryptes the given file using the given password,
+/// and writes the encrypted data to the outputfile. If `armor=True` then the outputfile
+/// will be written as ascii armored.
+/// filename: Input filename
+/// outputfile: Output encrypted filename
+/// password: The password as str.
+/// armor: default False.
+#[pyfunction]
+#[text_signature = "(filename, outputfile, keys, armor=True)"]
+fn encrypt_file_withpassword(filename: String, outputfile: String, passphrase: String, armor: Option<bool>) -> PyResult<bool> {
+
+    let encryptor = age::Encryptor::with_user_passphrase(secrecy::SecretString::new(passphrase));
+    encrypt_file_internal(filename, outputfile, encryptor, armor)
+}
+
+
+fn encrypt_file_internal(filename: String, outputfile: String, encryptor: age::Encryptor, armor: Option<bool>) -> PyResult<bool> {
     // First get the format for the output
     let format = match armor {
         Some(true) => age::Format::AsciiArmor,
         _ => age::Format::Binary,
     };
 
-    let encryptor = age::Encryptor::with_recipients(recipients);
     let mut input = File::open(filename).unwrap();
     let output = File::create(outputfile).unwrap();
     let mut writer = encryptor.wrap_output(output, format).unwrap();
@@ -136,9 +157,10 @@ fn encrypt_file(filename: String, outputfile: String, keys: Vec<String>, armor: 
     io::copy(&mut input, &mut writer).unwrap();
     writer.finish().unwrap();
     Ok(true)
+
 }
 
-/// This function encryptes the given file using a list of secret keys (as str),
+/// This function decryptes the given file using a list of secret keys (as str),
 /// and writes decrypted data to the outputfile.
 /// filename: Input filename
 /// outputfile: Output encrypted filename
@@ -161,6 +183,28 @@ fn decrypt_file(filename: String, outputfile: String, secret: String) -> PyResul
     Ok(true)
 }
 
+/// This function decryptes the given file using the given password,
+/// and writes decrypted data to the outputfile.
+/// filename: Input filename
+/// outputfile: Output encrypted filename
+/// password: as str
+#[pyfunction]
+#[text_signature = "(filename, outputfile, password)"]
+fn decrypt_file_withpassword(filename: String, outputfile: String, passphrase: String) -> PyResult<bool> {
+
+    match age::Decryptor::new(file_io::InputReader::new(Some(filename)).unwrap()).unwrap() {
+        age::Decryptor::Passphrase(decryptor) => {
+            let mut output = File::create(outputfile).unwrap();
+            let passkey = secrecy::SecretString::new(passphrase);
+            let mut inc = decryptor.decrypt(&passkey, None).unwrap();
+
+            io::copy(&mut inc, &mut output).unwrap();
+
+        },
+        _ => (),
+    }
+    Ok(true)
+}
 #[pymodule]
 /// A Python module implemented in Rust.
 fn pyage(_py: Python, m: &PyModule) -> PyResult<()> {
@@ -171,5 +215,7 @@ fn pyage(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(decrypt_file))?;
     m.add_wrapped(wrap_pyfunction!(encrypt_bytes_withpassword))?;
     m.add_wrapped(wrap_pyfunction!(decrypt_bytes_withpassword))?;
+    m.add_wrapped(wrap_pyfunction!(encrypt_file_withpassword))?;
+    m.add_wrapped(wrap_pyfunction!(decrypt_file_withpassword))?;
     Ok(())
 }
