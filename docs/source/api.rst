@@ -24,8 +24,19 @@ public keys, and an optional `armor`, and it returns encrypted text as bytes, or
 
         >>> data = b"The secret text"
         >>> key = "age1spp8yf63x4xu7l5esxlnzldwgmaaqmwrjw38vra9s7hw63pyzpqsq82gst"
-        >>> encrypted_btyes = pyage.encrypt_btyes(data, [key,])
+        >>> encrypted_btyes = pyage.encrypt_bytes(data, [key,]) # For raw bytes
 
+        >>> encrypted_btyes = pyage.encrypt_bytes(data, [key,], armor=True) # For ascii armored output
+        >>> print(encrypted_btyes.decode("utf-8"))
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSArZUlJS2NMbzJIK3NEeGlm
+        UXRaVkZCYzlGSytueitreDlJbWtwbWxQWmlFClBVT1h6djYvYjdnR3htZlpFbnNj
+        b09WMjFPbGFXUnF1OGJnYmRnN0hPU3cKLT4gam9pbnQtb2lsLWJmNiAyMCVPRgpQ
+        SVYrc1M0YkljVkVTYVhsNzJkM3owU2h5b01HY1VVMkxuOW5JTUpEWFlQdCt4UFdR
+        cmFqY2JacHBXdm96OXpyCi8wWm9URzRRWC9sak5XdFh4VDJiT0ZtYwotLS0gMUxB
+        SFNUVHJCVHFaZGhNQVRuNW5WemRtc2JGNlpwR1dlWUlERW82SHdlZwpgo/1tH1V9
+        oM1Iw5goNrm9DBYb83lhxFDekLl7p/MppLnReibUfkmEqf12zO8BkQ==
+        -----END AGE ENCRYPTED FILE-----
 
 decrypt_bytes()
 ---------------- 
