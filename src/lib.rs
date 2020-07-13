@@ -4,7 +4,6 @@ use std::fs::File;
 
 use age;
 use age::cli_common::file_io;
-use pyo3::exceptions::*;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pyo3::wrap_pyfunction;
@@ -35,10 +34,30 @@ fn encrypt_bytes(py: Python, data: Vec<u8>, reps: Vec<String>, armor: Option<boo
     }
 
     let encryptor = age::Encryptor::with_recipients(recipients);
+    encrypt_bytes_internal(py, data, encryptor, armor)
+}
+
+/// This function encryptes the given bytes using a password (as str).
+/// data: bytes
+/// password: password as str
+/// ascii: boolean, default False.
+#[pyfunction]
+#[text_signature = "(data, keys, armor=False)"]
+fn encrypt_bytes_withpassword(py: Python, data: Vec<u8>, passphrase: String, armor: Option<bool>) -> PyResult<PyObject> {
+
+    let encryptor = age::Encryptor::with_user_passphrase(secrecy::SecretString::new(passphrase));
+    encrypt_bytes_internal(py, data, encryptor, armor)
+}
+
+
+// Internal only function
+fn encrypt_bytes_internal(py: Python, data: Vec<u8>, encryptor: age::Encryptor, armor: Option<bool>) -> PyResult<PyObject> {
+    // First get the format for the output
     let format = match armor {
         Some(true) => age::Format::AsciiArmor,
         _ => age::Format::Binary,
     };
+
 
     let mut encrypted = vec![];
     let mut writer = encryptor
@@ -46,11 +65,13 @@ fn encrypt_bytes(py: Python, data: Vec<u8>, reps: Vec<String>, armor: Option<boo
         .unwrap();
     writer.write_all(&data[..]).unwrap();
     writer.finish().unwrap();
-
+    // Finally return the result
     Ok(PyBytes::new(py, &encrypted).into())
+
 }
 
-/// This function decrypts a given bytes using the secret key as str.
+
+/// This function decrypts the given bytes using the secret key as str.
 #[pyfunction]
 #[text_signature = "(data, secret)"]
 fn decrypt_bytes(py: Python, data: Vec<u8>, secret: String) -> PyResult<PyObject> {
@@ -63,6 +84,23 @@ fn decrypt_bytes(py: Python, data: Vec<u8>, secret: String) -> PyResult<PyObject
 
     let mut decrypted = vec![];
     let mut reader = decryptor.decrypt(&key).unwrap();
+    reader.read_to_end(&mut decrypted).unwrap();
+    Ok(PyBytes::new(py, &decrypted).into())
+}
+
+
+/// This function decrypts the given bytes using the given password (as str).
+#[pyfunction]
+#[text_signature = "(data, passphrase)"]
+fn decrypt_bytes_withpassword(py: Python, data: Vec<u8>, passphrase: String) -> PyResult<PyObject> {
+    let decryptor = match age::Decryptor::new(&data[..]).unwrap() {
+        age::Decryptor::Passphrase(d) => d,
+        _ => unreachable!(),
+    };
+
+    let passkey = secrecy::SecretString::new(passphrase);
+    let mut decrypted = vec![];
+    let mut reader = decryptor.decrypt(&passkey, None).unwrap();
     reader.read_to_end(&mut decrypted).unwrap();
     Ok(PyBytes::new(py, &decrypted).into())
 }
@@ -126,5 +164,7 @@ fn pyage(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(decrypt_bytes))?;
     m.add_wrapped(wrap_pyfunction!(encrypt_file))?;
     m.add_wrapped(wrap_pyfunction!(decrypt_file))?;
+    m.add_wrapped(wrap_pyfunction!(encrypt_bytes_withpassword))?;
+    m.add_wrapped(wrap_pyfunction!(decrypt_bytes_withpassword))?;
     Ok(())
 }
