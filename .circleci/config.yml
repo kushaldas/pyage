@@ -1,0 +1,79 @@
+---
+common-steps:
+  - &restore_cache
+    restore_cache:
+      key: deps1-{{ .Branch }}-{{ checksum "requirements-dev.txt" }}
+
+  - &save_cache
+    save_cache:
+      key: deps1-{{ .Branch }}-{{ checksum "requirements-dev.txt" }}
+      paths:
+        - ".venv"
+
+  - &install_system_packages
+    run:
+      name: Install system dependencies
+      command: sudo apt install -y python3-dev python3-pip python3-venv
+
+  - &install_dependencies
+    run:
+      command: |
+        python3 -m venv .venv
+        . .venv/bin/activate
+        python3 -m pip install -r requirements-dev.txt
+  - &install_rustup
+    run:
+      name: Install Rustup nightly
+      command: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install.sh
+        sh install.sh -y --default-toolchain nightly --component cargo
+
+  - &build_pyage
+    run:
+      name: Build pyage
+      command: |
+        . .venv/bin/activate
+        source /home/circleci/.cargo/env
+        maturin develop
+        maturin build --manylinux=off
+
+  - &test_pyage
+    run:
+      name: Running tests
+      command: |
+        . .venv/bin/activate
+        source /home/circleci/.cargo/env
+        python3 -m pytest -vvv
+
+version: 2
+jobs:
+  build-buster-3.7:
+    docker:
+      - image: circleci/python:3.7-buster
+    steps:
+      - checkout
+      - *install_system_packages
+      - *install_rustup
+      - *install_dependencies
+      - *build_pyage
+      - *test_pyage
+
+  build-buster-3.8:
+    docker:
+      - image: circleci/python:3.8-buster
+    steps:
+      - checkout
+      - *install_system_packages
+      - *install_rustup
+      - *install_dependencies
+      - *build_pyage
+      - *test_pyage
+
+
+workflows:
+  version: 2
+  pyage_ci:
+    jobs:
+    - build-buster-3.7
+    - build-buster-3.8
+
