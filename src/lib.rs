@@ -23,9 +23,10 @@ fn create_newkey() -> PyResult<(String, String)> {
 /// This function encryptes the given bytes using a list of secret keys (as str).
 /// data: bytes
 /// keys: a list of public keys as str
+/// ascii: boolean, default False.
 #[pyfunction]
-#[text_signature = "(data, keys)"]
-fn encrypt_bytes(py: Python, data: Vec<u8>, reps: Vec<String>) -> PyResult<PyObject> {
+#[text_signature = "(data, keys, armor=False)"]
+fn encrypt_bytes(py: Python, data: Vec<u8>, reps: Vec<String>, armor: Option<bool>) -> PyResult<PyObject> {
     let mut recipients: Vec<age::keys::RecipientKey> = Vec::new();
 
     for rep in &reps {
@@ -34,10 +35,14 @@ fn encrypt_bytes(py: Python, data: Vec<u8>, reps: Vec<String>) -> PyResult<PyObj
     }
 
     let encryptor = age::Encryptor::with_recipients(recipients);
+    let format = match armor {
+        Some(true) => age::Format::AsciiArmor,
+        _ => age::Format::Binary,
+    };
 
     let mut encrypted = vec![];
     let mut writer = encryptor
-        .wrap_output(&mut encrypted, age::Format::Binary)
+        .wrap_output(&mut encrypted, format)
         .unwrap();
     writer.write_all(&data[..]).unwrap();
     writer.finish().unwrap();

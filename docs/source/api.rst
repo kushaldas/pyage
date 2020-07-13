@@ -17,8 +17,8 @@ create_newkey()
 encrypt_bytes()
 ---------------
 
-`pyage.encrypt_bytes()` takes two arguments, first argument is the data to be encrypted in bytes, and a list of
-public keys, and it returns encrypted text as bytes.
+`pyage.encrypt_bytes()` takes three arguments, first argument is the data to be encrypted in bytes, and a list of
+public keys, and an optional `armor`, and it returns encrypted text as bytes, or ascii-armored value if you pass `armor=True`.
 
 ::
 
