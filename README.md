@@ -1,4 +1,4 @@
-# pyage Python module
+# pyage-rust Python module for age
 
 [![CircleCI branch](https://img.shields.io/circleci/project/github/kushaldas/pyage/master.svg)](https://circleci.com/gh/kushaldas/workflows/pyage/tree/master)
 
@@ -18,6 +18,12 @@ The reference interoperable Golang implementation is available at
 This Python module is written using the Rust crate [age](https://crates.io/crates/age).
 
 **NOTE:** Please do not use in production, this module is getting heavily developed.
+
+## Installation
+
+```
+python3 -m pip install pyage-rust
+```
 
 ## Usage
 
