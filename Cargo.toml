@@ -1,5 +1,5 @@
 [package]
-name = "pyage"
+name = "pyage-rust"
 version = "0.1.0"
 authors = ["Kushal Das <mail@kushaldas.in>"]
 edition = "2018"
@@ -26,7 +26,7 @@ features = ["cli-common"]
 [package.metadata.maturin]
 classifier = [
   "Development Status :: 3 - Alpha",
-  "License :: OSI Approved :: MIT",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Rust",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
