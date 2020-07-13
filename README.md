@@ -1,5 +1,7 @@
 # pyage Python module
 
+[![CircleCI branch](https://img.shields.io/circleci/project/github/kushaldas/pyage/master.svg)](https://circleci.com/gh/kushaldas/workflows/pyage/tree/master)
+
 age is a simple, secure and modern encryption tool with small explicit keys, no
 config options, and UNIX-style composability. The format specification is at
 [age-encryption.org/v1](https://age-encryption.org/v1).
@@ -19,7 +21,7 @@ This Python module is written using the Rust crate [age](https://crates.io/crate
 
 ## Usage
 
-Please check the tests and docs directory
+Please go through the [documentation](https://pyage-rust.readthedocs.io/en/latest/) for usage.
 
 
 ## LICENSE: MIT
