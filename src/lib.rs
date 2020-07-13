@@ -106,13 +106,15 @@ fn decrypt_bytes_withpassword(py: Python, data: Vec<u8>, passphrase: String) -> 
 }
 
 /// This function encryptes the given file using a list of public keys (as str),
-/// and writes the encrypted data to the outputfile.
+/// and writes the encrypted data to the outputfile. If `armor=True` then the outputfile
+/// will be written as ascii armored.
 /// filename: Input filename
 /// outputfile: Output encrypted filename
 /// keys: The list of public keys as str.
+/// armor: default False.
 #[pyfunction]
-#[text_signature = "(filename, outputfile, keys)"]
-fn encrypt_file(filename: String, outputfile: String, keys: Vec<String>) -> PyResult<bool> {
+#[text_signature = "(filename, outputfile, keys, armor=True)"]
+fn encrypt_file(filename: String, outputfile: String, keys: Vec<String>, armor: Option<bool>) -> PyResult<bool> {
     let mut recipients: Vec<age::keys::RecipientKey> = Vec::new();
 
     for rep in &keys {
@@ -120,13 +122,16 @@ fn encrypt_file(filename: String, outputfile: String, keys: Vec<String>) -> PyRe
         recipients.push(key);
     }
 
-    //let format = file_io::OutputFormat::Binary;
+    // First get the format for the output
+    let format = match armor {
+        Some(true) => age::Format::AsciiArmor,
+        _ => age::Format::Binary,
+    };
+
     let encryptor = age::Encryptor::with_recipients(recipients);
-    //let mut input = age::cli_common::file_io::InputReader::new(Some(filename)).unwrap();
     let mut input = File::open(filename).unwrap();
-    //let output = file_io::OutputWriter::new(Some(outputfile), format, 0o666).unwrap();
     let output = File::create(outputfile).unwrap();
-    let mut writer = encryptor.wrap_output(output, age::Format::Binary).unwrap();
+    let mut writer = encryptor.wrap_output(output, format).unwrap();
 
     io::copy(&mut input, &mut writer).unwrap();
     writer.finish().unwrap();
