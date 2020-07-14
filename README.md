@@ -25,6 +25,8 @@ This Python module is written using the Rust crate [age](https://crates.io/crate
 python3 -m pip install pyage-rust
 ```
 
+Right now there are prebuild wheels available only for Python 3.7 and Python 3.8 in Linux and MacOS.
+
 ## Usage
 
 Please go through the [documentation](https://pyage-rust.readthedocs.io/en/latest/) for usage.
