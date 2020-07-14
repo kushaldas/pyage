@@ -19,6 +19,9 @@ This Python module is written using the Rust crate [age](https://crates.io/crate
 
 **NOTE:** Please do not use in production, this module is getting heavily developed.
 
+
+![demo](https://kushaldas.in/images/pyage-rust1.gif)
+
 ## Installation
 
 ```
@@ -26,6 +29,22 @@ python3 -m pip install pyage-rust
 ```
 
 Right now there are prebuild wheels available only for Python 3.7 and Python 3.8 in Linux and MacOS.
+
+
+## How to build?
+
+You will need Rustup nightly toolchain from https://rustup.rs
+
+```
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install requirements-dev.txt
+maturin build
+```
+
+The above commands will create a wheel file in `target/wheels` directory.
+
+If you want to build for development only then use `maturin develop` command.
 
 ## Usage
 

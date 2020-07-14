@@ -70,7 +70,7 @@ will created ascii armored output.
 encrypt_file_withpassword()
 ----------------------------
 
-`pyage.encrypt_file()` takes 4 arguments, first the input file path as str, the output file path (as str) is the second argument, and the
+`pyage.encrypt_file_withpassword()` takes 4 arguments, first the input file path as str, the output file path (as str) is the second argument, and the
 3rd argument is the password as string, the 4th and the last optional argument is for `armor` output. If you pass `True`, then it
 will created ascii armored output.
 
@@ -96,7 +96,7 @@ It returns the decrypted bytes on success.
 decrypt_bytes_withpassword()
 ----------------------------- 
 
-`pyage.decrypt_bytes()` takes two arguments, first argument is the encrypted data as bytes, and then the password as string.
+`pyage.decrypt_bytes_withpassword()` takes two arguments, first argument is the encrypted data as bytes, and then the password as string.
 It returns the decrypted bytes on success.
 
 ::
@@ -119,7 +119,7 @@ in case of success.
 decrypt_file_withpassword()
 ---------------------------
 
-`pyage.decrypt_file()` takes 3 arguments, first the encrypted file path, then new decrypted output filepath, and then password. Returns `True`
+`pyage.decrypt_file_withpassword()` takes 3 arguments, first the encrypted file path, then new decrypted output filepath, and then password. Returns `True`
 in case of success.
 
 ::
